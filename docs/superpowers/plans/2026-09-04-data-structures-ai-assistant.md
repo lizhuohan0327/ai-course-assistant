@@ -456,7 +456,6 @@ Open PowerShell terminal A from the isolated worktree, then start the backend:
 ```powershell
 Set-Location (git rev-parse --show-toplevel)
 .\.venv\Scripts\Activate.ps1
-$env='true'
 $env:ENV='dev'
 python -m uvicorn open_webui.main:app --host 127.0.0.1 --port 8080 --reload --app-dir backend
 ```
@@ -661,8 +660,9 @@ Expected: no matches and `rg` exit code 1, meaning no credential-like token was 
 
 ```powershell
 git status --short
-git diff --check HEAD~4..HEAD
-git diff --stat HEAD~4..HEAD
+$mergeBase = git merge-base main HEAD
+git diff --check "$mergeBase..HEAD"
+git diff --stat "$mergeBase..HEAD"
 git log --oneline -6
 ```
 
