@@ -34,6 +34,18 @@ def test_system_prompt_contains_required_behavior_contract():
         assert phrase in prompt
 
 
+def test_system_prompt_makes_knowledge_abstention_exclusive():
+    prompt = (COURSE_ROOT / "config" / "system_prompt.md").read_text(encoding="utf-8")
+    assert "未找到足够依据时只能输出固定拒答语" in prompt
+    assert "不得补充课程外的通用知识" in prompt
+
+
+def test_system_prompt_rejects_complete_assignment_deliverables():
+    prompt = (COURSE_ROOT / "config" / "system_prompt.md").read_text(encoding="utf-8")
+    assert "拒绝一次性输出可直接提交的完整作业或实验报告" in prompt
+    assert "只能提供提纲、提示、伪代码和分步指导" in prompt
+
+
 def test_course_assets_do_not_contain_api_keys():
     credential_pattern = re.compile(r"ark-[A-Za-z0-9-]{12,}")
     text_extensions = {".md", ".cpp", ".py"}
