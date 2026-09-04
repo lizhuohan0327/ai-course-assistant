@@ -30,6 +30,13 @@ def test_generate_quiz_filters_repeats_and_hides_answers():
     assert all("explanation" not in question for question in first["questions"])
 
 
+def test_generate_quiz_uses_runtime_safe_defaults_when_optional_arguments_are_omitted():
+    result = json.loads(Tools().generate_quiz("图"))
+
+    assert len(result["questions"]) == 5
+    assert all(question["chapter"] == "图" for question in result["questions"])
+
+
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [

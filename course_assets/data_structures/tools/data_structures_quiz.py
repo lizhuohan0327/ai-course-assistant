@@ -150,11 +150,19 @@ class Tools:
     def generate_quiz(
         self,
         chapter: str = Field(..., description="课程章节名称"),
-        question_type: str = Field("mixed", description="single_choice、true_false 或 mixed"),
-        difficulty: str = Field("mixed", description="easy、medium、hard 或 mixed"),
-        count: int = Field(5, description="生成题目数量，范围 1 到 10"),
-        seed: int | None = Field(None, description="可选随机种子，用于复现实验"),
+        question_type: str = "mixed",
+        difficulty: str = "mixed",
+        count: int = 5,
+        seed: int | None = None,
     ) -> str:
+        """生成数据结构课程练习题。
+
+        :param chapter: 课程章节名称
+        :param question_type: single_choice、true_false 或 mixed
+        :param difficulty: easy、medium、hard 或 mixed
+        :param count: 生成题目数量，范围 1 到 10
+        :param seed: 可选随机种子，用于复现实验
+        """
         if chapter not in _CHAPTERS:
             return _error("请输入有效章节。")
         if question_type not in _QUESTION_TYPES:
