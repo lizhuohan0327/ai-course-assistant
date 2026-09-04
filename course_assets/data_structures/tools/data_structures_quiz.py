@@ -24,6 +24,18 @@ _CHAPTERS = (
 _QUESTION_TYPES = ("single_choice", "true_false", "mixed")
 _DIFFICULTIES = ("easy", "medium", "hard", "mixed")
 _PUBLIC_FIELDS = ("id", "chapter", "question_type", "difficulty", "question", "options")
+TRUE_FALSE_ANSWERS = {
+    "true": "true",
+    "正确": "true",
+    "对": "true",
+    "false": "false",
+    "错误": "false",
+    "错": "false",
+}
+
+
+class _QuizValidationError(ValueError):
+    pass
 
 
 def _question(
@@ -93,6 +105,45 @@ def _error(message: str) -> str:
     return json.dumps({"error": message}, ensure_ascii=False)
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise _QuizValidationError(f"JSON 对象包含重复键：{key}。")
+        result[key] = value
+    return result
+
+
+def _parse_answers(answers_json: str) -> dict[str, object]:
+    try:
+        submission = json.loads(answers_json, object_pairs_hook=_reject_duplicate_keys)
+    except json.JSONDecodeError as error:
+        raise _QuizValidationError("提交内容必须是合法 JSON。") from error
+
+    if not isinstance(submission, dict):
+        raise _QuizValidationError("提交内容必须是 JSON 对象。")
+
+    answers = submission.get("answers")
+    if not isinstance(answers, dict) or not answers:
+        raise _QuizValidationError("answers 不能为空，且必须是 JSON 对象。")
+    return answers
+
+
+def _normalize_answer(question: dict, answer: object) -> str:
+    if not isinstance(answer, str):
+        raise _QuizValidationError(f"题目 {question['id']} 的答案必须是字符串。")
+    if question["question_type"] == "single_choice":
+        return answer.strip().upper()
+    return TRUE_FALSE_ANSWERS.get(answer.strip().lower(), answer.strip().lower())
+
+
+def _display_correct_answer(question: dict) -> str:
+    correct_answer = question["correct_answer"]
+    if question["question_type"] == "true_false":
+        return "true" if correct_answer else "false"
+    return correct_answer
+
+
 class Tools:
     def generate_quiz(
         self,
@@ -126,3 +177,49 @@ class Tools:
             for item in random.Random(seed).sample(candidates, count)
         ]
         return json.dumps({"questions": questions}, ensure_ascii=False)
+
+    def grade_quiz(
+        self,
+        answers_json: str = Field(
+            ...,
+            description='JSON 对象字符串，例如 {"answers":{"graph-sc-001":"A"}}',
+        ),
+    ) -> str:
+        try:
+            answers = _parse_answers(answers_json)
+            questions_by_id = {question["id"]: question for question in QUESTION_BANK}
+            unknown_ids = [question_id for question_id in answers if question_id not in questions_by_id]
+            if unknown_ids:
+                raise _QuizValidationError(f"题目 ID 不存在：{unknown_ids[0]}。")
+
+            results = []
+            correct_count = 0
+            for question_id, answer in answers.items():
+                question = questions_by_id[question_id]
+                student_answer = _normalize_answer(question, answer)
+                correct_answer = _display_correct_answer(question)
+                correct = student_answer == correct_answer
+                correct_count += correct
+                results.append(
+                    {
+                        "question_id": question_id,
+                        "correct": correct,
+                        "student_answer": student_answer,
+                        "correct_answer": correct_answer,
+                        "explanation": question["explanation"],
+                        "source": question["source"],
+                    }
+                )
+        except _QuizValidationError as error:
+            return _error(str(error))
+
+        total = len(results)
+        return json.dumps(
+            {
+                "score": round(correct_count / total * 100),
+                "correct_count": correct_count,
+                "total": total,
+                "results": results,
+            },
+            ensure_ascii=False,
+        )

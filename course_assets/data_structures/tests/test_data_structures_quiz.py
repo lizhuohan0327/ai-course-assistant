@@ -44,3 +44,43 @@ def test_generate_quiz_rejects_invalid_or_unsatisfied_filters(kwargs, message):
     result = json.loads(Tools().generate_quiz(**kwargs))
     assert result["error"]
     assert message in result["error"]
+
+
+def test_grade_quiz_normalizes_answers_and_returns_explanations():
+    result = json.loads(
+        Tools().grade_quiz(
+            json.dumps(
+                {
+                    "answers": {
+                        "graph-sc-001": " c ",
+                        "graph-tf-001": "错误",
+                        "sorting-tf-001": "对",
+                        "list-sc-001": "",
+                    }
+                },
+                ensure_ascii=False,
+            )
+        )
+    )
+    assert result["score"] == 50
+    assert result["correct_count"] == 2
+    assert result["total"] == 4
+    assert [item["correct"] for item in result["results"]] == [True, True, False, False]
+    assert all(item["correct_answer"] for item in result["results"])
+    assert all(item["explanation"] for item in result["results"])
+    assert all(item["source"] for item in result["results"])
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        ("not-json", "合法 JSON"),
+        ('{"answers": {}}', "不能为空"),
+        ('{"answers": {"missing-id": "A"}}', "missing-id"),
+        ('{"answers":{"graph-sc-001":"A","graph-sc-001":"C"}}', "重复"),
+    ],
+)
+def test_grade_quiz_rejects_the_entire_invalid_submission(payload, message):
+    result = json.loads(Tools().grade_quiz(payload))
+    assert set(result) == {"error"}
+    assert message in result["error"]
