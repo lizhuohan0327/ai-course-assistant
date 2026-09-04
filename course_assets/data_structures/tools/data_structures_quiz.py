@@ -62,7 +62,7 @@ QUESTION_BANK: tuple[dict, ...] = (
     _question("list-tf-001", "线性表", "true_false", "easy", "链表节点在内存中的物理地址必须连续。", {}, False, "链式存储不要求节点的物理地址连续。", "01_课件型知识点/02_线性表.md"),
     _question("list-tf-002", "线性表", "true_false", "medium", "单链表维护尾指针时，表尾插入可达到 O(1)。", {}, True, "尾指针直接指向最后一个节点，避免了遍历查找表尾。", "01_课件型知识点/02_线性表.md"),
     _question("stack-queue-sc-001", "栈与队列", "single_choice", "easy", "栈遵循哪种访问原则？", {"A": "LIFO（后进先出）", "B": "FIFO（先进先出）", "C": "随机访问", "D": "按优先级访问"}, "A", "栈只在一端插入和删除，遵循后进先出。", "01_课件型知识点/03_栈与队列.md"),
-    _question("stack-queue-sc-002", "栈与队列", "single_choice", "medium", "广度优先搜索（BFS）通常使用哪种数据结构？", {"A": "栈", "B": "队列", "C": "散列表", "D": "二叉搜索树"}, "B", "BFS 按发现先后扩展结点，因此使用队列。", "01_课件型知识点/03_栈与队列.md"),
+    _question("stack-queue-sc-002", "栈与队列", "single_choice", "medium", "广度优先搜索（BFS）通常使用哪种数据结构？", {"A": "栈", "B": "队列", "C": "散列表", "D": "二叉搜索树"}, "B", "BFS 按发现先后扩展结点，因此使用队列。", "01_课件型知识点/05_图.md"),
     _question("stack-queue-sc-003", "栈与队列", "single_choice", "hard", "容量为 capacity 的牺牲一个存储单元的循环队列，其元素个数公式是？", {"A": "rear - front", "B": "(front - rear) % capacity", "C": "(rear - front + capacity) % capacity", "D": "(rear + front) % capacity"}, "C", "循环队列需加上 capacity 后取模以得到非负的队列长度。", "01_课件型知识点/03_栈与队列.md"),
     _question("stack-queue-tf-001", "栈与队列", "true_false", "easy", "队列遵循 FIFO（先进先出）原则。", {}, True, "队列从一端入队、另一端出队，最先进入的元素最先离开。", "01_课件型知识点/03_栈与队列.md"),
     _question("stack-queue-tf-002", "栈与队列", "true_false", "medium", "牺牲一个存储单元的循环队列中，队满条件与队空条件相同。", {}, False, "牺牲一个单元正是为了区分 front == rear 的队空状态和队满状态。", "01_课件型知识点/03_栈与队列.md"),
