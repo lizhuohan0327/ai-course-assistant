@@ -149,7 +149,7 @@ def _display_correct_answer(question: dict) -> str:
 class Tools:
     def generate_quiz(
         self,
-        chapter: str = Field(..., description="课程章节名称"),
+        chapter: str,
         question_type: str = "mixed",
         difficulty: str = "mixed",
         count: int = 5,

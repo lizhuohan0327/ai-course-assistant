@@ -1,4 +1,5 @@
 import json
+import inspect
 
 import pytest
 
@@ -35,6 +36,31 @@ def test_generate_quiz_uses_runtime_safe_defaults_when_optional_arguments_are_om
 
     assert len(result["questions"]) == 5
     assert all(question["chapter"] == "图" for question in result["questions"])
+
+
+def test_generate_quiz_signature_requires_chapter_and_documents_parameters():
+    parameters = inspect.signature(Tools().generate_quiz).parameters
+    descriptions = dict(
+        line.removeprefix(":param ").split(":", 1)
+        for line in inspect.getdoc(Tools.generate_quiz).splitlines()
+        if line.startswith(":param ")
+    )
+    descriptions = {
+        name: description.strip() for name, description in descriptions.items()
+    }
+
+    assert parameters["chapter"].default is inspect.Parameter.empty
+    assert parameters["question_type"].default == "mixed"
+    assert parameters["difficulty"].default == "mixed"
+    assert parameters["count"].default == 5
+    assert parameters["seed"].default is None
+    assert descriptions == {
+        "chapter": "课程章节名称",
+        "question_type": "single_choice、true_false 或 mixed",
+        "difficulty": "easy、medium、hard 或 mixed",
+        "count": "生成题目数量，范围 1 到 10",
+        "seed": "可选随机种子，用于复现实验",
+    }
 
 
 @pytest.mark.parametrize(
