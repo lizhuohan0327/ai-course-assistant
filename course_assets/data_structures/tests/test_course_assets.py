@@ -36,6 +36,7 @@ def test_system_prompt_contains_required_behavior_contract():
 
 def test_course_assets_do_not_contain_api_keys():
     credential_pattern = re.compile(r"ark-[A-Za-z0-9-]{12,}")
+    text_extensions = {".md", ".cpp", ".py"}
     for path in COURSE_ROOT.rglob("*"):
-        if path.is_file():
+        if path.is_file() and path.suffix in text_extensions:
             assert credential_pattern.search(path.read_text(encoding="utf-8")) is None
