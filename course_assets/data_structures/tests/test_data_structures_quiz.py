@@ -86,7 +86,16 @@ def test_grade_quiz_rejects_the_entire_invalid_submission(payload, message):
     assert message in result["error"]
 
 
-@pytest.mark.parametrize("payload", [None, 7, {"answers": {"graph-sc-001": "C"}}])
+@pytest.mark.parametrize(
+    "payload",
+    [
+        None,
+        7,
+        {"answers": {"graph-sc-001": "C"}},
+        b'{"answers": {"graph-sc-001": "C"}}',
+        bytearray(b'{"answers": {"graph-sc-001": "C"}}'),
+    ],
+)
 def test_grade_quiz_rejects_non_string_submission_values(payload):
     result = json.loads(Tools().grade_quiz(payload))
     assert set(result) == {"error"}

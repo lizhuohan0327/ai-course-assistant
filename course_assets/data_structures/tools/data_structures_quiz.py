@@ -115,6 +115,8 @@ def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict:
 
 
 def _parse_answers(answers_json: str) -> dict[str, object]:
+    if not isinstance(answers_json, str):
+        raise _QuizValidationError("提交内容必须是合法 JSON 字符串。")
     try:
         submission = json.loads(answers_json, object_pairs_hook=_reject_duplicate_keys)
     except (json.JSONDecodeError, TypeError) as error:
