@@ -1,3 +1,61 @@
+# 数据结构 AI 助教
+
+本仓库基于 [Open WebUI](https://github.com/open-webui/open-webui) 构建数据结构课程专属 AI 助教，面向课程问答、知识点复习、实验指导和客观题练习场景。项目接入 ModelArk `deepseek-v4-flash`，并绑定按章节整理的数据结构课程知识库。
+
+## 项目功能
+
+- 课程知识问答：覆盖绪论与算法复杂度、线性表、栈与队列、树与二叉树、图、查找与散列、排序等内容。
+- 知识库检索与引用：优先依据课程资料回答，并返回实际命中的资料来源。
+- 分层教学：可根据学生的入门、复习、考试或提高阶段调整讲解深度。
+- 练习题生成：按章节、题型和难度生成单选题、判断题或混合练习。
+- 客观题判分：基于题库答案确定性计算分数，返回逐题结果、解析和复习建议。
+- 学术诚信保护：不直接交付可提交的完整作业或实验报告，改为提供提纲、伪代码和分步指导。
+- 超范围控制：课程资料未覆盖的内容明确提示无法确认，避免编造资料和引用。
+
+## 项目目录
+
+```text
+course_assets/data_structures/
+├── config/                 # 系统提示词和 Open WebUI 配置说明
+├── knowledge_base/         # 课程知识库（课件、实验、示例代码、复习资料）
+├── tools/                  # Open WebUI 练习题生成与判分工具
+├── tests/                  # 自动化测试
+└── evaluation/             # 测试用例、优化对比和项目总结报告
+```
+
+## 本地开发
+
+后端依赖安装完成后，在项目根目录启动前端：
+
+```powershell
+npm run dev -- --host 127.0.0.1
+```
+
+另一个终端启动后端：
+
+```powershell
+Set-Location backend
+..\\.venv\\Scripts\\python.exe -m uvicorn open_webui.main:app --host 127.0.0.1 --port 8080 --loop asyncio
+```
+
+前端默认地址为 `http://127.0.0.1:5173`，后端地址为 `http://127.0.0.1:8080`。首次使用时，请在 Open WebUI Workspace 中导入或配置 `course_assets/data_structures/config/system_prompt.md`，绑定数据结构课程知识库和练习判分工具。
+
+## 测试与文档
+
+运行数据结构项目测试：
+
+```powershell
+.\\.venv\\Scripts\\python.exe -m pytest course_assets\\data_structures\\tests -q
+```
+
+当前测试结果为 `24 passed`。完整测试记录、重启后关键用例原始输出和项目总结见：
+
+- [测试记录](course_assets/data_structures/evaluation/test_cases.md)
+- [优化对比](course_assets/data_structures/evaluation/optimization_comparison.md)
+- [项目总结报告](course_assets/data_structures/evaluation/project_summary_report.md)
+
+---
+
 # Open WebUI 👋
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
